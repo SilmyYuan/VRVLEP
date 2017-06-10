@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v1.1",
+    "signature": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v1.1": {
+      "vrvlep.dal/1.0.0": {
+        "dependencies": {
+          "VRVLEP.Models": "1.0.0"
+        },
+        "runtime": {
+          "VRVLEP.DAL.dll": {}
+        }
+      },
+      "vrvlep.models/1.0.0": {
+        "runtime": {
+          "VRVLEP.Models.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "vrvlep.dal/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "vrvlep.models/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

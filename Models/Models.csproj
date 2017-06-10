@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <RootNamespace>VRVLEP.Models</RootNamespace>
+    <AssemblyName>VRVLEP.Models</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\VRVEIS-LEP\bin\</OutputPath>
+  </PropertyGroup>
+
+</Project>
