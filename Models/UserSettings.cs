@@ -4,7 +4,7 @@ using System.Text;
 
 namespace VRVLEP.Models
 {
-    public class AppConfigurations
+    public class UserSettings
     {
         #region 属性成员
 

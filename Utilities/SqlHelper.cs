@@ -5,8 +5,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using VRVLEP.Models;
 using Microsoft.Extensions.Caching.Memory;
+using VRVLEP.Models;
 
 namespace VRVLEP.Utilities
 {
@@ -21,7 +21,7 @@ namespace VRVLEP.Utilities
             {  
                 if (DataCache.GetCache("VRVEISConnectionString") == null)
                 {
-                    string connection = ConfigurationManager.GetAppSettings<AppConfigurations>("AppConfigurations").ConnectionString;
+                    string connection = SettingManager.GetAppSettings<UserSettings>("UserSettings").ConnectionString;
 
                     DataCache.SetCache("VRVEISConnectionString", connection, DateTime.Now.AddMinutes(2));   //数据库连接字符串在内存缓存2分钟
                 }

@@ -10,7 +10,7 @@ namespace VRVLEP.Utilities
     /// <summary>
     /// 公共配置类，用于读取特定路径中的json文件
     /// </summary>
-    public class ConfigurationManager
+    public class SettingManager
     {
         public static T GetAppSettings<T>(string key) where T : class, new()
         {
