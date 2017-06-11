@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>VRVLEP</AssemblyName>
     <RootNamespace>VRVLEP</RootNamespace>
+    <UserSecretsId>1495692f-b374-4687-a276-a3779f2de5de</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
