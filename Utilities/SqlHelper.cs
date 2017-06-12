@@ -7,11 +7,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using VRVLEP.Models;
+using System.Reflection;
 
 namespace VRVLEP.Utilities
 {
     public abstract class SqlHelper
     {
+        #region 数据库连接字符串
+
         /// <summary>
         /// 数据库连接字符串
         /// </summary>
@@ -31,6 +34,105 @@ namespace VRVLEP.Utilities
         }
 
 
+        /// <summary>
+        /// 返回SQLSERVER数据库的版本号[2000、2008、2012]
+        /// </summary>
+        /// <returns></returns>
+        public static int GetVersion()
+        {
+            int version = 0;
+            object SQLVERSION = DataCache.GetCache("MSSQLVERSION");
+            if (SQLVERSION == null)
+            {
+                string strSQLVERSION = SqlHelper.ExecuteScalar(SqlHelper.ConnectString, CommandType.Text, "SELECT @@VERSION", null).ToString();
+                strSQLVERSION = strSQLVERSION.Split('-')[0].Replace("Microsoft SQL Server", "").Trim();
+
+                strSQLVERSION = strSQLVERSION.Split(' ')[0].Trim();
+
+                if (!int.TryParse(strSQLVERSION, out version))
+                {
+                    version = 0;
+                }
+                DataCache.SetCache("MSSQLVERSION", version);
+            }
+            else
+            {
+                version = (int)SQLVERSION;
+            }
+            return version;
+        }
+
+        /// <summary>
+        /// 检查数据库连接情况
+        /// </summary>
+        /// <param name="connectionString">连接字符串</param>
+        /// <returns></returns>
+        public static bool CheckConnection(string connectionString)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            try
+            {
+                conn.Open();
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                    return true;
+                }
+                else
+                {
+                    conn.Close();
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                conn.Close();
+                return false;
+            }
+        }
+
+        #endregion
+        
+        /// <summary>
+        /// 为数据库执行准备Command的内部方法
+        /// </summary>
+        /// <param name="cmd">command对象</param>
+        /// <param name="conn">Database connection 对象</param>
+        /// <param name="trans">transaction 对象</param>
+        /// <param name="cmdType">Command类型</param>
+        /// <param name="cmdText">Command文本</param>
+        /// <param name="cmdParms">参数</param>
+        private static void PrepareCommand(SqlCommand cmd, SqlConnection conn, SqlTransaction trans, CommandType cmdType,
+            string cmdText, SqlParameter[] cmdParms)
+        {
+
+            if (conn.State != ConnectionState.Open)
+                conn.Open();
+
+            cmd.Connection = conn;
+            cmd.CommandText = cmdText;
+
+            if (trans != null)
+                cmd.Transaction = trans;
+
+            cmd.CommandType = cmdType;
+            cmd.CommandTimeout = 180;
+            if (cmdParms != null)
+            {
+                foreach (SqlParameter parm in cmdParms)
+                {
+                    if (parm.Value == null)
+                    {
+                        parm.Value = DBNull.Value;
+                    }
+                    cmd.Parameters.Add(parm);
+                }
+            }
+        }
+
+        #region ExecuteReader
+
+        [System.Obsolete("此方法已过时，建议使用ExecuteReader(string cmdText, params SqlParameter[] commandParameters) 方法", false)]
         public static SqlDataReader ExecuteReader(string connectionString, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
         {
             SqlCommand cmd = new SqlCommand();
@@ -49,6 +151,33 @@ namespace VRVLEP.Utilities
                 throw;
             }
         }
+
+        /// <summary>
+        /// 根据数据库连接字符串，执行返回结果集的查询语句
+        /// </summary>
+        /// <param name="cmdText"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+        public static IDataReader ExecuteReader(string cmdText, params SqlParameter[] commandParameters)
+        {
+            return ExecuteReader(CommandType.Text, cmdText, commandParameters);
+        }
+
+        /// <summary>
+        /// 根据数据库连接字符串，执行返回结果集的查询语句
+        /// </summary>
+        /// <param name="cmdType"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+        public static IDataReader ExecuteReader(CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
+        {
+            return ExecuteReader(SqlHelper.ConnectString, cmdType, cmdText, commandParameters);
+        }
+
+        #endregion
+
+        #region ExecuteNonQuery
 
         public static int ExecuteNonQuery(string connectionString, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
         {
@@ -108,6 +237,9 @@ namespace VRVLEP.Utilities
             return val;
         }
 
+        #endregion
+
+        #region ExecuteScalar
         public static object ExecuteScalar(string connectionString, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
         {
             SqlCommand cmd = new SqlCommand();
@@ -153,42 +285,7 @@ namespace VRVLEP.Utilities
             }
         }
 
-        /// <summary>
-        /// 为数据库执行准备Command的内部方法
-        /// </summary>
-        /// <param name="cmd">command对象</param>
-        /// <param name="conn">Database connection 对象</param>
-        /// <param name="trans">transaction 对象</param>
-        /// <param name="cmdType">Command类型</param>
-        /// <param name="cmdText">Command文本</param>
-        /// <param name="cmdParms">参数</param>
-        private static void PrepareCommand(SqlCommand cmd, SqlConnection conn, SqlTransaction trans, CommandType cmdType,
-            string cmdText, SqlParameter[] cmdParms)
-        {
-
-            if (conn.State != ConnectionState.Open)
-                conn.Open();
-
-            cmd.Connection = conn;
-            cmd.CommandText = cmdText;
-
-            if (trans != null)
-                cmd.Transaction = trans;
-
-            cmd.CommandType = cmdType;
-            cmd.CommandTimeout = 180;
-            if (cmdParms != null)
-            {
-                foreach (SqlParameter parm in cmdParms)
-                {
-                    if (parm.Value == null)
-                    {
-                        parm.Value = DBNull.Value;
-                    }
-                    cmd.Parameters.Add(parm);
-                }
-            }
-        }
+        #endregion
 
     }
 }

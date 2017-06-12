@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace VRVLEP.Utilities
 {
@@ -26,7 +25,7 @@ namespace VRVLEP.Utilities
         /// <summary>
         ///  删除
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
         public static void Delete(string key)
         {
@@ -62,6 +61,64 @@ namespace VRVLEP.Utilities
         public static void SetCache(string key, object obj, DateTime absoluteExpiration)
         {
             cache.Set(key, obj, absoluteExpiration);
+        }
+
+        /// <summary>
+        /// 设置当前应用程序指定key的Cache值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
+        /// <param name="Minutes"></param>
+        public static void SetCache(string key, object obj, int Minutes)
+        {
+            cache.Set(key, obj, DateTime.Now.AddMinutes((Minutes < 1 ? 5 : Minutes)));
+        }
+
+        /// <summary>
+        /// 设置当前应用程序指定CacheKey的Cache值 20m        
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
+        public static void SetCache20M(string key, object obj)
+        {
+            SetCache(key, obj, 20);
+        }
+
+        /// <summary>
+        /// 判断数据是否存在缓存中
+        /// 存在:从缓存中拿取
+        /// 否则:重新加载
+        /// [无参]
+        /// </summary>
+        /// <param name="key">缓存名称</param>
+        /// <param name="func"> 缓存失效时调用的方法</param>
+        public static T GetCacheData<T>(string key, Func<T> func) where T : class
+        {
+            if (!IsExists(key))
+            {
+                T result = func();
+                SetCache20M(key, result);
+            }
+            T t = GetCache(key) as T;
+            return t;
+        }
+
+        /// <summary>
+        /// 判断数据是否存在缓存中
+        /// 存在:从缓存中拿取
+        /// 否则:重新加载
+        /// [无参]
+        /// </summary>
+        /// <param name="key">缓存名称</param>
+        /// <param name="func"> 缓存失效时调用的方法</param>
+        public static string GetCacheData(string key, Func<string> func)
+        {
+            if (!IsExists(key))
+            {
+                string result = func();
+                SetCache20M(key, result);
+            }
+            return GetCache(key).ToString();
         }
     }
 }

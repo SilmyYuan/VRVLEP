@@ -36,6 +36,12 @@ namespace VRVLEP.Controllers
 
             string strConnect2 = SqlHelper.ConnectString;
 
+            int version = SqlHelper.GetVersion();
+
+            Dictionary<string, string> dic2 = new Dictionary<string, string>();
+
+            dic2.Add("Id", "2");
+
             return new string[] { "value1", "value2" };
         }
 
