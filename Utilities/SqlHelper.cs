@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
-using VRVLEP.Models;
 using System.Reflection;
+using System.Text;
+using VRVLEP.Models;
 
 namespace VRVLEP.Utilities
 {
@@ -287,5 +284,35 @@ namespace VRVLEP.Utilities
 
         #endregion
 
+        #region Others
+
+        public static string GetWhereCondtion<T>(string table, Dictionary<string, string> whereCondition) where T : new()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (KeyValuePair<string, string> KeyValue in whereCondition)
+            {
+                T tEntity = new T();
+                foreach (System.Reflection.PropertyInfo info in tEntity.GetType().GetProperties())
+                {
+                    if (KeyValue.Key.Trim().ToLower() == info.Name.Trim().ToLower())
+                    {
+                        sb.Append(" and " + table + "." + KeyValue.Key + "='" + KeyValue.Value + "'");
+                    }
+                    else if (KeyValue.Key.Trim().ToLower() == info.Name.Trim().ToLower() &&
+                        (info.PropertyType == typeof(int)
+                        || info.PropertyType == typeof(float)
+                        || info.PropertyType == typeof(long)
+                        || info.PropertyType == typeof(double)
+                        || info.PropertyType == typeof(decimal))
+                        )
+                    {
+                        sb.Append(" and " + table + "." + KeyValue.Key + "=" + KeyValue.Value + "");
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+
+        #endregion
     }
 }

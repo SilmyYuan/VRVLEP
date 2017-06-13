@@ -34,8 +34,6 @@ namespace VRVLEP.Controllers
             string strtp = tp.ToJson();
             string strli2 = li2.ToJson();
 
-            string strConnect2 = SqlHelper.ConnectString;
-
             int version = SqlHelper.GetVersion();
 
             Dictionary<string, string> dic2 = new Dictionary<string, string>();
