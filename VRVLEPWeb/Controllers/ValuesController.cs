@@ -15,9 +15,12 @@ namespace VRVLEP.Controllers
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
-        {                 
+        {
             //获取配置文件中的数据库连接字符串
             //string sss = ConfigurationManager.GetAppSettings<AppConfigurations>("AppConfigurations").ConnectionString;
+
+
+            string ss = new VRVLEP.DAL.NPocoTest().getTest();
 
             string strConnect = SqlHelper.ConnectString;
 
@@ -47,6 +50,7 @@ namespace VRVLEP.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
+            string url = Request.Query["url"];
             return "value";
         }
 
